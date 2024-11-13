@@ -1,0 +1,183 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Moy Klass Task",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/lessons": {
+      "get": {
+        "summary": "Retrieves lessons data",
+        "operationId": "getLessons",
+        "description": "Retrieves lessons data based on provided filters",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "description": "Date or date range in YYYY-MM-DD format",
+            "schema": {
+              "type": "string",
+              "example": "2019-01-01,2019-09-01"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "description": "Lesson status (0 - not conducted, 1 - conducted)",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "teacherIds",
+            "description": "IDs of teachers separated by commas",
+            "schema": {
+              "type": "string",
+              "example": "1,2,3"
+            }
+          },
+          {
+            "in": "query",
+            "name": "studentsCount",
+            "description": "Number of students or range of students separated by commas",
+            "schema": {
+              "type": "string",
+              "example": "5,10"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "description": "Page number (starts from 1)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "lessonsPerPage",
+            "description": "Number of lessons per page (default: 5)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lessons data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lesson"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Lesson": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Lesson ID"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Lesson date"
+          },
+          "title": {
+            "type": "string",
+            "description": "Lesson title"
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "Lesson status"
+          },
+          "visitCount": {
+            "type": "integer",
+            "description": "Number of students who visited the lesson"
+          },
+          "students": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Student"
+            }
+          },
+          "teachers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Teacher"
+            }
+          }
+        }
+      },
+      "Student": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Student ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Student name"
+          },
+          "visit": {
+            "type": "boolean",
+            "description": "Whether the student visited the lesson"
+          }
+        }
+      },
+      "Teacher": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Teacher ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Teacher name"
+          }
+        }
+      }
+    }
+  }
+}

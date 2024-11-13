@@ -1,0 +1,54 @@
+{
+  "name": "@timurrin/moyklass-task",
+  "version": "0.0.0",
+  "license": "ISC",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node esbuild.js",
+    "build:bundle": "node esbuild.js full",
+    "build:dev": "tsc",
+    "dev": "node esbuild.js watch",
+    "fix": "prettier . --write && eslint --fix .",
+    "format": "prettier . --write",
+    "lint": "eslint --fix .",
+    "migration:down": "knex migrate:rollback",
+    "migration:ls": "npx knex migrate:list",
+    "migration:restart": "knex migrate:rollback && knex migrate:latest",
+    "migration:up": "knex migrate:latest",
+    "prepack": "npm run build",
+    "start": "node dist/index.js",
+    "test": "prettier . -c && eslint --max-warnings 0 . && npm run test:code",
+    "test:code": "tsc && mocha './build/dev/test' --exit"
+  },
+  "dependencies": {
+    "@cinnabar-forge/utils": "0.2.0",
+    "dotenv": "16.4.5",
+    "express": "4.21.1",
+    "helmet": "8.0.0",
+    "jsonwebtoken": "9.0.2",
+    "knex": "3.1.0",
+    "pg": "8.13.1",
+    "winston": "3.17.0"
+  },
+  "devDependencies": {
+    "@cinnabar-forge/eslint-plugin": "0.7.3",
+    "@types/chai": "5.0.1",
+    "@types/express": "5.0.0",
+    "@types/jsonwebtoken": "9.0.7",
+    "@types/mocha": "10.0.9",
+    "@types/supertest": "6.0.2",
+    "chai": "5.1.2",
+    "esbuild": "0.24.0",
+    "mocha": "10.8.2",
+    "pre-commit": "1.2.2",
+    "supertest": "7.0.0",
+    "typescript": "5.6.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pre-commit": [
+    "test"
+  ]
+}

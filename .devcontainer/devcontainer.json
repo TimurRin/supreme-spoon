@@ -1,0 +1,15 @@
+{
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "streetsidesoftware.code-spell-checker"
+      ]
+    }
+  },
+  "dockerComposeFile": "./docker-compose.yml",
+  "service": "api",
+  "shutdownAction": "stopCompose",
+  "workspaceFolder": "/workspace"
+}
