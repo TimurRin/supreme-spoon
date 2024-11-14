@@ -3,11 +3,17 @@
  * @param dateString
  */
 export function validateDate(dateString: string) {
-  const [year, month, day] = dateString.split('-').map(Number);
+  const [year, month, day] = dateString.split("-").map(Number);
 
-  return !(isNaN(year) || isNaN(month) || isNaN(day) ||
-    month < 1 || month > 12 || day < 1 ||
-    !isValidDay(year, month, day));
+  return !(
+    isNaN(year) ||
+    isNaN(month) ||
+    isNaN(day) ||
+    month < 1 ||
+    month > 12 ||
+    day < 1 ||
+    !isValidDay(year, month, day)
+  );
 }
 
 /**

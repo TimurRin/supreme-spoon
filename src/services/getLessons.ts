@@ -22,8 +22,6 @@ export async function getLessons(
     "application/json"
   >
 > {
-  console.log("getLessons", query);
-
   try {
     const dateArray = query.date && query.date.split(",");
 
@@ -108,15 +106,21 @@ export async function getLessons(
       : [];
 
     const knexQuery = knex("lessons")
-      .with("visit_counts", (k) => {
+      .with("student_counts", (k) => {
         return k
-          .table("lesson_students")
           .select(
-            "lesson_id",
-            knex.raw("COUNT(DISTINCT student_id) AS visit_count"),
+            "lessons.id AS lesson_id",
+            knex.raw(
+              "COUNT(DISTINCT lesson_students.student_id) AS student_count",
+            ),
           )
-          .where("visit", true)
-          .groupBy("lesson_id");
+          .from("lessons")
+          .leftJoin(
+            "lesson_students",
+            "lesson_students.lesson_id",
+            "lessons.id",
+          )
+          .groupBy("lessons.id");
       })
       .select(
         "lessons.id",
@@ -124,7 +128,7 @@ export async function getLessons(
         "lessons.title",
         "lessons.status",
         knex.raw(
-          `coalesce(MAX("visit_counts"."visit_count"), 0) as visit_count`,
+          `CAST(COUNT(DISTINCT CASE WHEN lesson_students.visit IS TRUE THEN students.id END) AS integer) AS "visitCount"`,
         ),
         knex.raw(
           "COALESCE(jsonb_agg(DISTINCT jsonb_build_object('id', teachers.id, 'name', teachers.name)) FILTER (WHERE teachers.id IS NOT NULL), '[]') AS teachers",
@@ -142,7 +146,7 @@ export async function getLessons(
       .leftJoin("teachers", "lesson_teachers.teacher_id", "teachers.id")
       .leftJoin("lesson_students", "lesson_students.lesson_id", "lessons.id")
       .leftJoin("students", "lesson_students.student_id", "students.id")
-      .leftJoin("visit_counts", "visit_counts.lesson_id", "lessons.id")
+      .leftJoin("student_counts", "student_counts.lesson_id", "lessons.id")
       .groupBy("lessons.id");
 
     if (dateRange.length === 2) {
@@ -156,19 +160,17 @@ export async function getLessons(
     }
 
     if (teacherIds.array.length > 0) {
-      knexQuery.whereIn("lesson_teachers.teacher_id", teacherIds.array);
+      knexQuery.whereIn("lesson_teachers_check.teacher_id", teacherIds.array);
     }
 
     if (studentsCountRange.length === 2) {
-      knexQuery.whereBetween("visit_count", [
+      knexQuery.whereBetween("student_count", [
         studentsCountRange[0],
         studentsCountRange[1],
       ]);
     } else if (studentsCountRange.length === 1) {
-      knexQuery.where("visit_count", studentsCountRange[0]);
+      knexQuery.where("student_count", studentsCountRange[0]);
     }
-
-    console.log("lessonsPerPage", lessonsPerPage, "page", page);
 
     knexQuery.limit(lessonsPerPage).offset(lessonsPerPage * (page - 1));
 
